@@ -17,12 +17,12 @@
  * JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
  */
 
-#include "IRemote.h"
+#include "IRemoteSend.h"
 #include "application.h"
 
-IRsend::IRsend(int irPin) : irPin(irPin) {};
+IRemoteSend::IRemoteSend(int irPin) : irPin(irPin) {};
 
-void IRsend::sendNEC(unsigned long data, int nbits)
+void IRemoteSend::sendNEC(unsigned long data, int nbits)
 {
   enableIROut(38);
   mark(NEC_HDR_MARK);
@@ -42,7 +42,7 @@ void IRsend::sendNEC(unsigned long data, int nbits)
   space(0);
 }
 
-void IRsend::sendSony(unsigned long data, int nbits) {
+void IRemoteSend::sendSony(unsigned long data, int nbits) {
   enableIROut(40);
   mark(SONY_HDR_MARK);
   space(SONY_HDR_SPACE);
@@ -60,7 +60,7 @@ void IRsend::sendSony(unsigned long data, int nbits) {
   }
 }
 
-void IRsend::sendRaw(unsigned int buf[], int len, int hz)
+void IRemoteSend::sendRaw(unsigned int buf[], int len, int hz)
 {
   enableIROut(hz);
   for (int i = 0; i < len; i++) {
@@ -75,7 +75,7 @@ void IRsend::sendRaw(unsigned int buf[], int len, int hz)
 }
 
 // Note: first bit must be a one (start bit)
-void IRsend::sendRC5(unsigned long data, int nbits)
+void IRemoteSend::sendRC5(unsigned long data, int nbits)
 {
   enableIROut(36);
   data = data << (32 - nbits);
@@ -97,7 +97,7 @@ void IRsend::sendRC5(unsigned long data, int nbits)
 }
 
 // Caller needs to take care of flipping the toggle bit
-void IRsend::sendRC6(unsigned long data, int nbits)
+void IRemoteSend::sendRC6(unsigned long data, int nbits)
 {
   enableIROut(36);
   data = data << (32 - nbits);
@@ -143,7 +143,7 @@ For the DISH codes, only send the last for characters of the hex.
 i.e. use 0x1C10 instead of 0x0000000000001C10 which is listed in the
 linked LIRC file.
 */
-void IRsend::sendSharp(unsigned long data, int nbits) {
+void IRemoteSend::sendSharp(unsigned long data, int nbits) {
   unsigned long invertdata = data ^ SHARP_TOGGLE_MASK;
   enableIROut(38);
   for (int i = 0; i < nbits; i++) {
@@ -177,7 +177,7 @@ void IRsend::sendSharp(unsigned long data, int nbits) {
   delay(46);
 }
 
-void IRsend::sendDISH(unsigned long data, int nbits)
+void IRemoteSend::sendDISH(unsigned long data, int nbits)
 {
   enableIROut(56);
   mark(DISH_HDR_MARK);
@@ -195,7 +195,7 @@ void IRsend::sendDISH(unsigned long data, int nbits)
   }
 }
 
-void IRsend::sendPanasonic(unsigned int address, unsigned long data) {
+void IRemoteSend::sendPanasonic(unsigned int address, unsigned long data) {
     enableIROut(35);
     mark(PANASONIC_HDR_MARK);
     space(PANASONIC_HDR_SPACE);
@@ -223,7 +223,7 @@ void IRsend::sendPanasonic(unsigned int address, unsigned long data) {
     space(0);
 }
 
-void IRsend::sendJVC(unsigned long data, int nbits, int repeat)
+void IRemoteSend::sendJVC(unsigned long data, int nbits, int repeat)
 {
     enableIROut(38);
     data = data << (32 - nbits);
@@ -246,7 +246,7 @@ void IRsend::sendJVC(unsigned long data, int nbits, int repeat)
     space(0);
 }
 
-void IRsend::mark(int time) {
+void IRemoteSend::mark(int time) {
   // Sends an IR mark (frequency burst output) for the specified number of microseconds.
   noInterrupts();
   
@@ -262,7 +262,7 @@ void IRsend::mark(int time) {
   interrupts();
 }
 
-void IRsend::space(int time) {
+void IRemoteSend::space(int time) {
   // Sends an IR space (no output) for the specified number of microseconds.
   digitalWrite(irPin, LOW); // Takes about 3 microsecondes
   if (time > 3) {
@@ -270,7 +270,7 @@ void IRsend::space(int time) {
   }
 }
 
-void IRsend::enableIROut(int khz) {
+void IRemoteSend::enableIROut(int khz) {
   // Enables IR output.  The khz value controls the modulation frequency in kilohertz.
   // MAX frequency is 166khz.
   pinMode(irPin, OUTPUT);
