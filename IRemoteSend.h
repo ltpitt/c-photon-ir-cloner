@@ -12,17 +12,17 @@
  * JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
  */
 
-#ifndef IRremote_h
-#define IRremote_h
+#ifndef IRremoteSend_h
+#define IRremoteSend_h
 
-class IRsend
+class IRemoteSend
 {
   const int irPin;
   int burstWait;
   int burstLength;
 
 public:
-  IRsend(int irPin);
+  IRemoteSend(int irPin);
   void sendNEC(unsigned long data, int nbits);
   void sendSony(unsigned long data, int nbits);
   // Neither Sanyo nor Mitsubishi send is implemented yet
